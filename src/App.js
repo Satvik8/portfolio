@@ -67,6 +67,7 @@ const App = () => {
     const a = document.createElement("a");
     a.href = resumePdfUrl;
     a.download = "Satvik_Resume.pdf";
+    a.target = "_blank"; // Add the target attribute
     a.click();
   };
 
