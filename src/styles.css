@@ -59,6 +59,11 @@
   width: 100%;
 }
 
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bs-primary) #fff;
+}
+
 @media (max-width: 768px) {
   .section-padding {
     padding-top: 60px;

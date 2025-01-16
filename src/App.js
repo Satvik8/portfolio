@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
-import backImg from "./Diam infinity 3.png";
+import backImg from "./backImage.webp";
+import emailjs from "@emailjs/browser";
 
 const App = () => {
   const [isVisible, setIsVisible] = useState({});
@@ -60,11 +61,67 @@ const App = () => {
     },
   ];
 
+  const handleDownloadResume = (e) => {
+    e.preventDefault();
+    const resumePdfUrl = `https://drive.google.com/file/d/1qdfKuc8T8Osssw61mt_GvZum8I8Cx0-K/view?usp=drivesdk`;
+    const a = document.createElement("a");
+    a.href = resumePdfUrl;
+    a.download = "Satvik_Resume.pdf";
+    a.click();
+  };
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      await emailjs.send(
+        "service_td8uspl", // Replace with your EmailJS service ID
+        "template_5hmwc73", // Replace with your EmailJS template ID
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          message: formData.message,
+          to_name: "Satvik", // Your name
+        },
+        "IPfaPPdI9bPEzOSIW" // Replace with your EmailJS public key
+      );
+
+      setSubmitStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.log(error);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+      // Reset status after 5 seconds
+      setTimeout(() => setSubmitStatus(null), 5000);
+    }
+  };
+
   return (
-    <div>
+    <div
+      className="custom-scrollbar"
+      style={{ height: "100vh", overflowY: "scroll" }}
+    >
       {/* Navbar */}
       <nav className="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow">
-        <div className="container">
+        <div className="d-flex justify-content-between align-items-center w-100 px-3">
           <a className="navbar-brand fw-bold text-primary" href="#home">
             Satvik Gadhiya
           </a>
@@ -96,8 +153,9 @@ const App = () => {
                   {item === "Download my Resume" ? (
                     <a
                       className="nav-link px-3"
-                      href="../public/satvik_resume.pdf" // Path to your resume file in the public folder
-                      download="My_Resume.pdf" // Name of the downloaded file
+                      onClick={handleDownloadResume}
+                      href="#"
+                      style={{ cursor: "pointer" }}
                     >
                       {item}
                     </a>
@@ -117,35 +175,42 @@ const App = () => {
       </nav>
 
       {/* Hero Section */}
-      <section
-        className="hero-section d-flex align-items-center justify-content-center text-white"
-        style={{
-          // backgroundImage: 'url("./backImage.webp")',
-          backgroundImage: `url(${backImg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          minHeight: "100vh",
-          position: "relative",
-        }}
-      >
-        <div className="dark-overlay"></div>
-        <div className="container position-relative text-center">
-          <div className="row justify-content-center">
-            <div className="col-md-8">
-              <h1 className="display-4 fw-bold mb-4">Frontend Web Developer</h1>
-              <p className="lead mb-4">
-                Crafting seamless digital experiences with passion
-              </p>
-              <a
-                href="#contact"
-                className="btn btn-light btn-lg px-5 py-3 rounded-pill"
-              >
-                Get in Touch
-              </a>
+      <div style={{ paddingTop: "56px" }}>
+        <section
+          className="hero-section d-flex align-items-center justify-content-center text-white"
+          style={{
+            // backgroundImage: 'url("./backImage.webp")',
+            backgroundImage: `url(${backImg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            minHeight: "100vh",
+            position: "relative",
+          }}
+        >
+          {/* <div className="dark-overlay"></div> */}
+          <div className="container position-relative text-center">
+            <div className="row justify-content-center">
+              <div className="col-md-8">
+                <h1
+                  className="display-4 fw-bold mb-4"
+                  style={{ color: "rgb(0 136 175)" }}
+                >
+                  Frontend Web Developer
+                </h1>
+                <p className="lead mb-4">
+                  Crafting seamless digital experiences with passion
+                </p>
+                <a
+                  href="#contact"
+                  className="btn btn-light btn-lg px-5 py-3 rounded-pill"
+                >
+                  Get in Touch
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* About Section */}
       <section
@@ -153,12 +218,18 @@ const App = () => {
         className={`py-5 section-padding fade-in ${
           isVisible.about ? "visible" : ""
         }`}
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <div className="container">
           <div className="row">
             <div className="col-md-8 mx-auto">
-              <h2 className="display-5 fw-bold mb-4">About Me</h2>
-              <p className="lead text-muted">
+              <h2 className="display-5 fw-bold mb-4 text-center">About Me</h2>
+              <p className="lead text-muted text-center">
                 Hi, I'm Satvik, a passionate frontend web developer dedicated to
                 creating exceptional user experiences. With expertise in modern
                 web technologies and a keen eye for design, I transform complex
@@ -175,6 +246,12 @@ const App = () => {
         className={`py-5 section-padding bg-light fade-in ${
           isVisible.skills ? "visible" : ""
         }`}
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <div className="container">
           <h2 className="display-5 fw-bold mb-5 text-center">Skills</h2>
@@ -198,6 +275,12 @@ const App = () => {
         className={`py-5 section-padding fade-in ${
           isVisible.projects ? "visible" : ""
         }`}
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <div className="container">
           <h2 className="display-5 fw-bold mb-5 text-center">Projects</h2>
@@ -233,6 +316,12 @@ const App = () => {
         className={`py-5 section-padding bg-primary text-white fade-in ${
           isVisible.contact ? "visible" : ""
         }`}
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <div className="container">
           <h2 className="display-5 fw-bold mb-5 text-center">Let's Connect</h2>
@@ -240,12 +329,15 @@ const App = () => {
             <div className="col-md-8 col-lg-6">
               <div className="card border-0">
                 <div className="card-body p-4">
-                  <form>
+                  <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                       <input
                         type="text"
                         className="form-control"
                         placeholder="Your Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -254,6 +346,9 @@ const App = () => {
                         type="email"
                         className="form-control"
                         placeholder="Your Email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -262,16 +357,63 @@ const App = () => {
                         className="form-control"
                         rows="4"
                         placeholder="Your Message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
                         required
                       ></textarea>
                     </div>
                     <button
                       type="submit"
-                      className="btn btn-primary w-100 py-3"
+                      className={`btn btn-primary w-100 py-3 ${
+                        isSubmitting ? "disabled" : ""
+                      }`}
+                      disabled={isSubmitting}
                     >
-                      Send Message
+                      {isSubmitting ? "Sending..." : "Send Message"}
                     </button>
+
+                    {submitStatus === "success" && (
+                      <div className="alert alert-success mt-3" role="alert">
+                        Message sent successfully!
+                      </div>
+                    )}
+
+                    {submitStatus === "error" && (
+                      <div className="alert alert-danger mt-3" role="alert">
+                        Failed to send message. Please try again later.
+                      </div>
+                    )}
                   </form>
+
+                  {/* Additional contact information */}
+                  {/* <div className="mt-5 text-center">
+                    <h4 className="mb-4">Or connect with me on:</h4>
+                    <div className="d-flex justify-content-center gap-4">
+                      <a
+                        href="https://linkedin.com/in/your-profile"
+                        className="text-primary"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <i className="bi bi-linkedin fs-3"></i>
+                      </a>
+                      <a
+                        href="https://github.com/your-profile"
+                        className="text-dark"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <i className="bi bi-github fs-3"></i>
+                      </a>
+                      <a
+                        href="mailto:your.email@example.com"
+                        className="text-danger"
+                      >
+                        <i className="bi bi-envelope fs-3"></i>
+                      </a>
+                    </div>
+                  </div> */}
                 </div>
               </div>
             </div>
