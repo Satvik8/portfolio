@@ -155,7 +155,6 @@ const App = () => {
                     <a
                       className="nav-link px-3"
                       onClick={handleDownloadResume}
-                      href="#"
                       style={{ cursor: "pointer" }}
                     >
                       {item}
@@ -187,6 +186,7 @@ const App = () => {
             minHeight: "100vh",
             position: "relative",
           }}
+          id="home"
         >
           {/* <div className="dark-overlay"></div> */}
           <div className="container position-relative text-center">
@@ -194,17 +194,26 @@ const App = () => {
               <div className="col-md-8">
                 <h1
                   className="display-4 fw-bold mb-4"
-                  style={{ color: "rgb(0 136 175)" }}
+                  style={{
+                    color: "rgb(0 136 175)",
+                    textShadow: "rgba(0, 0, 0, 0.9) -2px -3px 2px",
+                  }}
                 >
                   Frontend Web Developer
                 </h1>
-                <p className="lead mb-4">
+                <p
+                  className="lead mb-4"
+                  style={{
+                    color: "rgb(0 136 175)",
+                    textShadow: "rgba(0, 0, 0, 0.9) -2px -3px 2px",
+                    fontWeight: "bold",
+                    fontSize: "1.3  rem",
+                    letterSpacing: "2px",
+                  }}
+                >
                   Crafting seamless digital experiences with passion
                 </p>
-                <a
-                  href="#contact"
-                  className="btn btn-light btn-lg px-5 py-3 rounded-pill"
-                >
+                <a href="#contact" className="btn btn-border-4  px-5 py-3">
                   Get in Touch
                 </a>
               </div>
