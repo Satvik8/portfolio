@@ -1,26 +1,137 @@
 export const skills = [
+  // Core Web Technologies
   "HTML 5",
   "CSS 3",
-  "Bootstrap",
   "JavaScript",
-  "C",
+  "TypeScript",
+
+  // Frontend Frameworks & Libraries
   "React",
-  "Java",
-  "Node js",
+  "Next.js",
+  "Redux",
+  "Redux Toolkit",
+  "React Router",
+  "React Query",
+
+  // Styling & UI
+  "Tailwind CSS",
+  "Bootstrap",
+  "SCSS",
+  "Styled Components",
+  "Ant Design",
+  "Radix UI",
+  "Framer Motion",
+
+  // Backend & APIs
+  "Node.js",
+  "REST APIs",
+  "WebSocket",
+  "Axios",
+
+  // Blockchain & Web3
+  "Web3",
+
+  "Blockchain SDKs",
+
+  // Data Visualization
+  "Chart.js",
+  "Recharts",
+  "ApexCharts",
+  "Three.js",
+
+  // Version Control
   "Git",
-  "Git Hub",
+  "GitHub",
+
+  // Other Technologies
+  "Vite",
+  "Moment.js",
+  "React Hook Form",
+  "Lottie",
+  "Canvas APIs",
+  "PHP",
+  "MySQL",
+  "C",
+  "Java",
 ];
 
 export const projects = [
   {
-    title: "WORK EXPERIENCE Block stack Pvt. Ltd. | Bangalore",
-    duration: "",
-    role: "",
+    title: "Pay circle (FinTech Platform)",
+    duration: " 2023 -  2024",
+    role: "Frontend Developer",
     description:
-      "Developed user interfaces for Play Circle, a platform facilitating custody, sending, and receiving of multi-currency Fiat and digital assets. Innovated cost-effective solutions with zero hidden fees and minimized transaction costs. Enhanced features for cross-currency and cross-border transactions, and supported investment and trading in over 10 digital assets from a unified dashboard.Ensured robust, real-time transaction processing capable of handling over 100 million transactions daily. Contributed to the implementation of FDIC-insured USD custody, enhancing user control over assets and supporting fluid financial operations. Developed a user-friendly business platform for managing cash flow, optimizing financial routines, and simplifying the payment process. Integrated multi-currency management, diverse payment acceptance, and QuickBooks integration for seamless business transaction management.",
-    technologies: ["REACT", "JAVASCRIPT", "BOOTSTRAP", "CSS"],
-    links: [],
-    contributions: [],
+      "A financial technology platform with payment processing, analytics dashboards, and secure authentication workflows.",
+    technologies: [
+      "React.js",
+      "Redux",
+      "Ant Design",
+      "Bootstrap",
+      "Chart.js",
+      "React Hook Form",
+      "Axios",
+      "Plaid API (react-plaid-link)",
+      "WebSocket (stompjs/sockjs-client)",
+      "React Router v6",
+    ],
+    links: [
+      {
+        name: "Link1",
+        url: "https://paycircle.io/",
+      },
+      {
+        name: "Link2",
+        url: "https://pay.paycircle.io/",
+      },
+    ],
+    contributions: [
+      "Built secure payment flows using Plaid API and React Hook Form for validation.",
+      "Developed real-time transaction dashboards with Chart.js and WebSocket integration.",
+      "Implemented role-based routing (React Router v6) and Redux for state management.",
+      "Designed responsive UI components with Ant Design and Bootstrap for consistency.",
+      "Optimized performance by lazy-loading components and reducing bundle size by 35%.",
+      "Integrated OTP authentication (react-otp-input) and session management (react-idle-timer).",
+    ],
+  },
+  {
+    title: "CFL (Crypto Fantasy League)",
+    duration: "April 2025 - Ongoing",
+    role: "Frontend Developer",
+    description:
+      "A decentralized fantasy crypto gaming platform enabling users to create token-based teams and compete in real-time contests driven by live market data.",
+    technologies: [
+      "React.js",
+      "Redux Toolkit",
+      "Tailwind CSS",
+      "Radix UI",
+      "Vite",
+      "Wagmi & Ethers.js",
+      "React Query",
+      "Axios",
+      "WebSocket (real-time leaderboard)",
+      "React Router v7",
+      "Lottie (animations)",
+      "Moment.js",
+    ],
+    links: [
+      {
+        name: "Link1",
+        url: "https://cfldev.diamante.io/",
+      },
+      {
+        name: "Link2",
+        url: "https://cfl.diamante.io/",
+      },
+    ],
+    contributions: [
+      "Developed wallet-based authentication flow using WalletConnect with support for MetaMask and Trust Wallet.",
+      "Implemented dynamic contest management with modules for Join, Create Team, Leaderboard, and Result Tracking.",
+      "Built real-time scoring logic and leaderboard updates using WebSocket events and React Query.",
+      "Created modular UI components using Tailwind CSS and Radix UI for team builder, wallet, and leaderboard.",
+      "Integrated Redux Toolkit and Redux Persist for robust session and state management.",
+      "Worked on bonus campaigns, referral system, and OTP-based 2FA for enhanced user engagement and security.",
+      "Optimized performance using code-splitting, lazy-loading, and efficient component rendering patterns.",
+    ],
   },
   {
     title: "DIAM Casino - Blockchain Gaming Platform",
@@ -168,7 +279,7 @@ export const projects = [
       "JavaScript",
       "HTML5",
       "CSS3",
-      "Talwind css",
+      "Tailwind css",
       "readct redux",
       "framer motion",
       "react-toastify",
