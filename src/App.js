@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./styles.css";
 import backImg from "./backImage.webp";
 import emailjs from "@emailjs/browser";
+import { projects, skills } from "./Data/data.js";
 
 const App = () => {
   const [isVisible, setIsVisible] = useState({});
@@ -26,40 +27,6 @@ const App = () => {
 
     return () => observer.disconnect();
   }, []);
-
-  const skills = [
-    "HTML 5",
-    "CSS 3",
-    "Bootstrap",
-    "JavaScript",
-    "C",
-    "React",
-    "Java",
-    "Node js",
-    "Git",
-    "Git Hub",
-  ];
-
-  const projects = [
-    {
-      title: "WORK EXPERIENCE Block stack Pvt. Ltd. | Bangalore",
-      description:
-        "Developed user interfaces for Play Circle, a platform facilitating custody, sending, and receiving of multi-currency Fiat and digital assets. Innovated cost-effective solutions with zero hidden fees and minimized transaction costs. Enhanced features for cross-currency and cross-border transactions, and supported investment and trading in over 10 digital assets from a unified dashboard.Ensured robust, real-time transaction processing capable of handling over 100 million transactions daily. Contributed to the implementation of FDIC-insured USD custody, enhancing user control over assets and supporting fluid financial operations. Developed a user-friendly business platform for managing cash flow, optimizing financial routines, and simplifying the payment process. Integrated multi-currency management, diverse payment acceptance, and QuickBooks integration for seamless business transaction management.",
-      technologies: ["REACT", "JAVASCRIPT", "BOOTSTRAP", "CSS"],
-    },
-    {
-      title: "HealthCare Web Application",
-      description:
-        "A comprehensive hospital management system featuring robust patient data handling, doctor profiles, and an intuitive appointment booking system. Built with security and efficiency in mind.",
-      technologies: ["HTML", "CSS", "PHP", "MySQL"],
-    },
-    {
-      title: "Group Traveling Web Application",
-      description:
-        "A collaborative travel planning platform enabling tourists to connect and plan their adventures together. Features include shared itineraries, group messaging, and real-time updates.",
-      technologies: ["HTML", "CSS", "PHP", "MySQL"],
-    },
-  ];
 
   const handleDownloadResume = (e) => {
     e.preventDefault();
@@ -302,9 +269,48 @@ const App = () => {
                     <h3 className="card-title h4 fw-bold mb-3">
                       {project.title}
                     </h3>
-                    <p className="card-text text-muted">
-                      {project.description}
-                    </p>
+                    {project.duration && (
+                      <h6 className="card-subtitle mb-2 text-muted">
+                        {project.duration}
+                      </h6>
+                    )}
+                    {project.role && (
+                      <p className="card-text fw-bold mb-1">{project.role}</p>
+                    )}
+                    {project.description && (
+                      <p className="card-text text-muted">
+                        {project.description}
+                      </p>
+                    )}
+                    {project.links && project.links.length > 0 && (
+                      <div className="mb-2">
+                        {project.links.map((link) => (
+                          <a
+                            key={link.url}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="d-block text-primary text-decoration-none"
+                          >
+                            🔗 {link.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                    {project.contributions &&
+                      project.contributions.length > 0 && (
+                        <div className="mt-3">
+                          <ul className="list-unstyled">
+                            {project.contributions.map(
+                              (contribution, index) => (
+                                <li key={index} className="text-muted mb-1">
+                                  • {contribution}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
                     <div className="mt-3">
                       {project.technologies.map((tech) => (
                         <span key={tech} className="badge bg-primary me-2 mb-2">
