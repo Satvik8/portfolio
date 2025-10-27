@@ -33,7 +33,7 @@ const App = () => {
 
   const handleDownloadResume = (e) => {
     e.preventDefault();
-    const resumePdfUrl = `https://drive.google.com/file/d/1qdfKuc8T8Osssw61mt_GvZum8I8Cx0-K/view?usp=drivesdk`;
+    const resumePdfUrl = `https://drive.google.com/file/d/1BGcVeRG1CPuJJkTjOiFNwHSGWrGTxlmJ/view?usp=drivesdk`;
     const a = document.createElement("a");
     a.href = resumePdfUrl;
     a.download = "Satvik_Resume.pdf";
