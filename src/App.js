@@ -33,12 +33,14 @@ const App = () => {
 
   const handleDownloadResume = (e) => {
     e.preventDefault();
-    const resumePdfUrl = `https://drive.google.com/file/d/1BGcVeRG1CPuJJkTjOiFNwHSGWrGTxlmJ/view?usp=drivesdk`;
+    // Convert Google Drive view URL to direct download URL
+    const resumePdfUrl = `https://drive.google.com/uc?export=download&id=1BGcVeRG1CPuJJkTjOiFNwHSGWrGTxlmJ`;
     const a = document.createElement("a");
     a.href = resumePdfUrl;
     a.download = "Satvik_Resume.pdf";
-    a.target = "_blank"; // Add the target attribute
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
   };
 
   const [formData, setFormData] = useState({
@@ -122,13 +124,13 @@ const App = () => {
               ].map((item) => (
                 <li className="nav-item" key={item}>
                   {item === "Download my Resume" ? (
-                    <a
-                      className="nav-link px-3"
+                    <button
+                      className="nav-link px-3 border-0 bg-transparent"
                       onClick={handleDownloadResume}
                       style={{ cursor: "pointer" }}
                     >
                       {item}
-                    </a>
+                    </button>
                   ) : (
                     <a
                       className="nav-link px-3"
