@@ -5,6 +5,9 @@ import emailjs from "@emailjs/browser";
 import { projects, skills } from "./Data/data.js";
 
 const App = () => {
+  console.log("Projects:", projects); // Debug: Check if projects is imported
+  console.log("Projects type:", typeof projects);
+  console.log("Is array:", Array.isArray(projects));
   const [isVisible, setIsVisible] = useState({});
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
 
@@ -249,9 +252,7 @@ const App = () => {
       {/* Projects Section */}
       <section
         id="projects"
-        className={`py-5 section-padding fade-in ${
-          isVisible.projects ? "visible" : ""
-        }`}
+        className="py-5 section-padding"
         style={{
           minHeight: "100vh",
           display: "flex",
@@ -262,66 +263,78 @@ const App = () => {
         <div className="container">
           <h2 className="display-5 fw-bold mb-5 text-center">Projects</h2>
           <div className="row g-4">
-            {projects.map((project) => (
-              <div className="col-md-6" key={project.title}>
-                <div className="card  border-0 shadow-sm project-card">
-                  <div className="card-body">
-                    <h3 className="card-title h4 fw-bold mb-3">
-                      {project.title}
-                    </h3>
-                    {project.duration && (
-                      <h6 className="card-subtitle mb-2 text-muted">
-                        {project.duration}
-                      </h6>
-                    )}
-                    {project.role && (
-                      <p className="card-text fw-bold mb-1">{project.role}</p>
-                    )}
-                    {project.description && (
-                      <p className="card-text text-muted">
-                        {project.description}
-                      </p>
-                    )}
-                    {project.links && project.links.length > 0 && (
-                      <div className="mb-2">
-                        {project.links.map((link) => (
-                          <a
-                            key={link.url}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="d-block text-primary text-decoration-none"
-                          >
-                            🔗 {link.name}
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                    {project.contributions &&
-                      project.contributions.length > 0 && (
-                        <div className="mt-3">
-                          <ul className="list-unstyled">
-                            {project.contributions.map(
-                              (contribution, index) => (
-                                <li key={index} className="text-muted mb-1">
-                                  • {contribution}
-                                </li>
-                              )
-                            )}
-                          </ul>
+            {projects &&
+              Array.isArray(projects) &&
+              projects.map((project, projectIndex) => (
+                <div className="col-md-6" key={`project-${projectIndex}`}>
+                  <div className="card  border-0 shadow-sm project-card">
+                    <div className="card-body">
+                      <h3 className="card-title h4 fw-bold mb-3">
+                        {project.title}
+                      </h3>
+                      {project.duration && (
+                        <h6 className="card-subtitle mb-2 text-muted">
+                          {project.duration}
+                        </h6>
+                      )}
+                      {project.role && (
+                        <p className="card-text fw-bold mb-1">{project.role}</p>
+                      )}
+                      {project.description && (
+                        <p className="card-text text-muted">
+                          {project.description}
+                        </p>
+                      )}
+                      {project.links && project.links.length > 0 && (
+                        <div className="mb-2">
+                          {project.links
+                            .filter(
+                              (link) => link.url && link.url.trim() !== ""
+                            )
+                            .map((link, linkIndex) => (
+                              <a
+                                key={`link-${linkIndex}-${projectIndex}`}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="d-block text-primary text-decoration-none"
+                              >
+                                🔗 {link.name}
+                              </a>
+                            ))}
                         </div>
                       )}
-                    <div className="mt-3">
-                      {project.technologies.map((tech) => (
-                        <span key={tech} className="badge bg-primary me-2 mb-2">
-                          {tech}
-                        </span>
-                      ))}
+                      {project.contributions &&
+                        project.contributions.length > 0 && (
+                          <div className="mt-3">
+                            <ul className="list-unstyled">
+                              {project.contributions.map(
+                                (contribution, index) => (
+                                  <li key={index} className="text-muted mb-1">
+                                    • {contribution}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      {project.technologies &&
+                        project.technologies.length > 0 && (
+                          <div className="mt-3">
+                            {project.technologies.map((tech, techIndex) => (
+                              <span
+                                key={`tech-${techIndex}-${projectIndex}`}
+                                className="badge bg-primary me-2 mb-2"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </section>

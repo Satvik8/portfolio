@@ -94,6 +94,52 @@ export const projects = [
     ],
   },
   {
+    title: "DIAMANTE Node Sale Platform - Quantum Proof NFT Pre-Booking",
+    duration: "January 2025 - Present", // Adjust dates based on actual duration
+    role: "Frontend Developer",
+    description:
+      "Web3-powered pre-booking platform for Quantum Proof NFTs with wallet integration, token swapping, and countdown timer. Features secure blockchain transactions, real-time updates via WebSocket, and responsive mobile-first design.",
+    technologies: [
+      "React.js",
+      "TypeScript",
+      "Wagmi",
+      "Viem",
+      "Redux Toolkit",
+      "Tailwind CSS",
+      "Radix UI",
+      "Ethers.js",
+      "ConnectKit",
+      "WebSocket",
+      "React Router v7",
+      "Axios",
+      "Sonner",
+      "Lucide React",
+    ],
+    links: [
+      {
+        name: "Production",
+        url: "https://devnodesale.diamante.io/", // Add actual URL
+      },
+      {
+        name: "Development",
+        url: "https://devnodesale.diamante.io/", // Add actual URL
+      },
+    ],
+    contributions: [
+      "Developed responsive Web3 pre-booking platform with ConnectKit integration supporting MetaMask, WalletConnect, Coinbase Wallet, and 100+ other wallets",
+      "Built advanced token swapping interface with smart routing, slippage tolerance settings, and real-time quote calculations using PancakeSwap API",
+      "Implemented secure wallet authentication flow with email registration and blockchain-based identity verification",
+      "Created countdown timer component with real-time updates leading to exclusive NFT launch event (October 2025)",
+      "Developed Redux Toolkit state management architecture for wallet connections, swap transactions, and user registration flows",
+      "Built responsive UI components using Tailwind CSS and Radix UI with mobile-first design approach and custom clip-path styling",
+      "Integrated WebSocket for real-time slot availability updates and live transaction status tracking",
+      "Implemented advanced swap features including token allowance checks, approval workflows, and multi-route optimization for best execution prices",
+      "Designed post-purchase dashboard with transaction history, NFT status tracking, and distribution countdown for successful subscribers",
+      "Optimized performance with code-splitting, lazy-loading, and efficient state management to handle high concurrent user traffic",
+      "Created seamless user flow from wallet connection → email registration → token swap → NFT pre-booking confirmation",
+    ],
+  },
+  {
     title: "Quantum Oracle Chronicles (QOC) - Web3 Puzzle Gaming Platform",
     duration: "2024 - Ongoing",
     role: "Frontend Developer",
@@ -149,7 +195,6 @@ export const projects = [
       "Optimized performance with code splitting, lazy loading, React Query caching, and efficient WebSocket message handling",
     ],
   },
-  
   {
     title: "CFL (Crypto Fantasy League)",
     duration: "April 2025 - Ongoing",
