@@ -33,11 +33,20 @@ const App = () => {
 
   const handleDownloadResume = (e) => {
     e.preventDefault();
-    // Convert Google Drive view URL to direct download URL
-    const resumePdfUrl = `https://drive.google.com/uc?export=download&id=1BGcVeRG1CPuJJkTjOiFNwHSGWrGTxlmJ`;
+
+    // For production: Host the PDF in your public folder and uncomment the line below
+    // Download your resume.pdf and place it in the 'public' folder
+    const resumePdfUrl = "/resume.pdf";
+
+    // For now: Using Google Drive
+    // const resumePdfUrl =
+    //   "https://drive.google.com/uc?id=1BGcVeRG1CPuJJkTjOiFNwHSGWrGTxlmJ&export=download";
+
+    // Create download link
     const a = document.createElement("a");
     a.href = resumePdfUrl;
     a.download = "Satvik_Resume.pdf";
+    a.style.display = "none";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
