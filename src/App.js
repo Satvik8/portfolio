@@ -1,71 +1,479 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./styles.css";
-import backImg from "./backImage.webp";
 import emailjs from "@emailjs/browser";
-import { projects, skills } from "./Data/data.js";
+import { projects, skillGroups, skills } from "./Data/data.js";
+import ParticleField from "./components/ParticleField";
+import {
+  useActiveSection,
+  useCountUp,
+  useReveal,
+  useScrollProgress,
+  useTypewriter,
+} from "./hooks";
 
-const App = () => {
-  console.log("Projects:", projects); // Debug: Check if projects is imported
-  console.log("Projects type:", typeof projects);
-  console.log("Is array:", Array.isArray(projects));
-  const [isVisible, setIsVisible] = useState({});
-  const [isNavCollapsed, setIsNavCollapsed] = useState(true);
-  const currentYear = new Date().getFullYear();
+const NAV_ITEMS = ["About", "Skills", "Projects", "Contact"];
+const SECTION_IDS = ["home", "about", "skills", "projects", "contact"];
+const WEB3_PATTERN = /web3|wagmi|viem|ethers|blockchain/i;
+
+const isWeb3 = (project) =>
+  project.technologies.some((tech) => WEB3_PATTERN.test(tech));
+
+// Drops empty and duplicate URLs.
+const validLinks = (project) =>
+  (project.links || []).filter(
+    (link, i, all) =>
+      link.url &&
+      link.url.trim() !== "" &&
+      all.findIndex((other) => other.url === link.url) === i
+  );
+
+const hostname = (url) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+};
+
+const Icon = ({ name }) => {
+  const paths = {
+    arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+    external: (
+      <>
+        <path d="M14 4h6v6" />
+        <path d="M10 14 20 4" />
+        <path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" />
+      </>
+    ),
+    download: (
+      <>
+        <path d="M12 4v11" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 20h14" />
+      </>
+    ),
+    close: <path d="M6 6l12 12M18 6 6 18" />,
+    send: <path d="m4 12 16-8-6 16-2-7-8-1Z" />,
+    up: <path d="M12 19V5M6 11l6-6 6 6" />,
+    check: <path d="m5 12 5 5 9-10" />,
+  };
+  return (
+    <svg
+      className="icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+};
+
+const downloadResume = () => {
+  const a = document.createElement("a");
+  a.href = "/resume.pdf";
+  a.download = "Satvik_Resume.pdf";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+
+// Card that tracks the cursor with a soft radial highlight.
+const SpotlightCard = ({ className = "", children, ...rest }) => {
+  const onMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty("--my", `${e.clientY - rect.top}px`);
+  };
+  return (
+    <div className={`spotlight ${className}`} onMouseMove={onMove} {...rest}>
+      {children}
+    </div>
+  );
+};
+
+const SectionHeading = ({ eyebrow, title }) => (
+  <div className="section-heading" data-reveal>
+    <span className="eyebrow">{eyebrow}</span>
+    <h2>{title}</h2>
+  </div>
+);
+
+const Navbar = ({ active, scrolled, progress }) => {
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setIsVisible((prev) => ({
-            ...prev,
-            [entry.target.id]: entry.isIntersecting,
-          }));
-        });
-      },
-      { threshold: 0.1 }
+    document.body.classList.toggle("no-scroll", open);
+  }, [open]);
+
+  return (
+    <header className={`navbar ${scrolled ? "is-scrolled" : ""}`}>
+      <div className="scroll-progress" style={{ transform: `scaleX(${progress})` }} />
+      <div className="container navbar-inner">
+        <a className="brand" href="#home" onClick={() => setOpen(false)}>
+          <span className="brand-mark">SG</span>
+          <span className="brand-name">Satvik Gadhiya</span>
+        </a>
+
+        <nav className={`nav-links ${open ? "is-open" : ""}`}>
+          {NAV_ITEMS.map((item, i) => {
+            const id = item.toLowerCase();
+            return (
+              <a
+                key={item}
+                href={`#${id}`}
+                className={`nav-link ${active === id ? "is-active" : ""}`}
+                style={{ "--i": i }}
+                onClick={() => setOpen(false)}
+              >
+                {item}
+              </a>
+            );
+          })}
+          <button
+            type="button"
+            className="btn btn-outline nav-resume"
+            style={{ "--i": NAV_ITEMS.length }}
+            onClick={() => {
+              setOpen(false);
+              downloadResume();
+            }}
+          >
+            <Icon name="download" /> Download my Resume
+          </button>
+        </nav>
+
+        <button
+          type="button"
+          className={`menu-toggle ${open ? "is-open" : ""}`}
+          aria-label="Toggle navigation"
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+    </header>
+  );
+};
+
+const Hero = () => {
+  const title = useTypewriter("Frontend Web Developer");
+  const marquee = [...skills, ...skills];
+
+  return (
+    <section id="home" className="hero">
+      <ParticleField />
+      <div className="orb orb-a" />
+      <div className="orb orb-b" />
+      <div className="grid-overlay" />
+
+      <div className="container hero-content">
+        <p className="hero-greeting hero-anim" style={{ "--d": "0.1s" }}>
+          <span className="wave">👋</span> Hi, I'm Satvik Gadhiya
+        </p>
+        <h1 className="hero-title">
+          <span className="gradient-text">{title}</span>
+          <span className="caret" aria-hidden="true" />
+        </h1>
+        <p className="hero-subtitle hero-anim" style={{ "--d": "0.5s" }}>
+          Crafting seamless digital experiences with passion
+        </p>
+        <div className="hero-actions hero-anim" style={{ "--d": "0.7s" }}>
+          <a href="#contact" className="btn btn-primary">
+            Get in Touch <Icon name="arrow" />
+          </a>
+          <a href="#projects" className="btn btn-ghost">
+            View Projects
+          </a>
+        </div>
+      </div>
+
+      <div className="marquee hero-anim" style={{ "--d": "0.9s" }} aria-hidden="true">
+        <div className="marquee-track">
+          {marquee.map((skill, i) => (
+            <span key={i} className="marquee-item">
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <a href="#about" className="scroll-cue" aria-label="Scroll to About">
+        <span />
+      </a>
+    </section>
+  );
+};
+
+const Stat = ({ value, label, delay }) => {
+  const [ref, count] = useCountUp(value);
+  return (
+    <SpotlightCard className="stat card" data-reveal style={{ "--d": delay }}>
+      <span ref={ref} className="stat-value gradient-text">
+        {count}+
+      </span>
+      <span className="stat-label">{label}</span>
+    </SpotlightCard>
+  );
+};
+
+const About = () => {
+  const stats = useMemo(() => {
+    const technologies = new Set(
+      projects.flatMap((p) => p.technologies.map((t) => t.toLowerCase()))
     );
-
-    document.querySelectorAll("section[id]").forEach((section) => {
-      observer.observe(section);
-    });
-
-    return () => observer.disconnect();
+    return [
+      { value: projects.length, label: "Projects" },
+      { value: skills.length, label: "Skills" },
+      { value: projects.filter(isWeb3).length, label: "Web3 Projects" },
+      { value: technologies.size, label: "Technologies Used" },
+    ];
   }, []);
 
-  const handleDownloadResume = (e) => {
-    e.preventDefault();
+  return (
+    <section id="about" className="section">
+      <div className="container">
+        <SectionHeading eyebrow="01 — Introduction" title="About Me" />
+        <div className="about-grid">
+          <p className="about-text" data-reveal>
+            Hi, I'm Satvik, a passionate frontend web developer dedicated to
+            creating exceptional user experiences. With expertise in modern web
+            technologies and a keen eye for design, I transform complex
+            challenges into elegant, user-friendly solutions.
+          </p>
+          <div className="stats">
+            {stats.map((stat, i) => (
+              <Stat key={stat.label} {...stat} delay={`${i * 0.1}s`} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
-    // For production: Host the PDF in your public folder and uncomment the line below
-    // Download your resume.pdf and place it in the 'public' folder
-    const resumePdfUrl = "/resume.pdf";
+const Skills = () => (
+  <section id="skills" className="section section-alt">
+    <div className="container">
+      <SectionHeading eyebrow="02 — Toolbox" title="Skills" />
+      <div className="skills-grid">
+        {skillGroups.map((group, i) => (
+          <SpotlightCard
+            key={group.title}
+            className="card skill-group"
+            data-reveal
+            style={{ "--d": `${(i % 4) * 0.08}s` }}
+          >
+            <h3>{group.title}</h3>
+            <div className="chips">
+              {group.items.map((skill) => (
+                <span key={skill} className="chip">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </SpotlightCard>
+        ))}
+      </div>
+    </div>
+  </section>
+);
 
-    // For now: Using Google Drive
-    // const resumePdfUrl =
-    //   "https://drive.google.com/uc?id=1BGcVeRG1CPuJJkTjOiFNwHSGWrGTxlmJ&export=download";
+const ProjectCard = ({ project, index, onOpen }) => {
+  const links = validLinks(project);
+  const shownTech = project.technologies.slice(0, 5);
+  const extra = project.technologies.length - shownTech.length;
 
-    // Create download link
-    const a = document.createElement("a");
-    a.href = resumePdfUrl;
-    a.download = "Satvik_Resume.pdf";
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+  return (
+    <SpotlightCard
+      className="card project-card"
+      data-reveal
+      style={{ "--d": `${(index % 2) * 0.1}s` }}
+    >
+      <div className="project-top">
+        <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
+        {project.duration && project.duration.trim() && (
+          <span className="project-duration">{project.duration.trim()}</span>
+        )}
+      </div>
+      <h3 className="project-title">{project.title}</h3>
+      {project.role && <p className="project-role">{project.role}</p>}
+      <p className="project-desc">{project.description}</p>
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+      <div className="chips">
+        {shownTech.map((tech) => (
+          <span key={tech} className="chip chip-sm">
+            {tech}
+          </span>
+        ))}
+        {extra > 0 && <span className="chip chip-sm chip-muted">+{extra}</span>}
+      </div>
+
+      <div className="project-footer">
+        <div className="project-links">
+          {links.map((link, i) => (
+            <a
+              key={`${link.url}-${i}`}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link"
+            >
+              {hostname(link.url)} <Icon name="external" />
+            </a>
+          ))}
+        </div>
+        {project.contributions.length > 0 && (
+          <button type="button" className="btn-link" onClick={onOpen}>
+            View details <Icon name="arrow" />
+          </button>
+        )}
+      </div>
+    </SpotlightCard>
+  );
+};
+
+const ProjectModal = ({ project, onClose }) => {
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.body.classList.add("no-scroll");
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.classList.remove("no-scroll");
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  const links = validLinks(project);
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+          <Icon name="close" />
+        </button>
+        <div className="modal-meta">
+          {project.role && <span>{project.role}</span>}
+          {project.duration && project.duration.trim() && (
+            <span>{project.duration.trim()}</span>
+          )}
+        </div>
+        <h3 id="modal-title" className="modal-title gradient-text">
+          {project.title}
+        </h3>
+        <p className="project-desc">{project.description}</p>
+
+        {links.length > 0 && (
+          <div className="modal-links">
+            {links.map((link, i) => (
+              <a
+                key={`${link.url}-${i}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline btn-sm"
+              >
+                {hostname(link.url)} <Icon name="external" />
+              </a>
+            ))}
+          </div>
+        )}
+
+        <h4 className="modal-subheading">Key Contributions</h4>
+        <ul className="contributions">
+          {project.contributions.map((item, i) => (
+            <li key={i} style={{ "--d": `${0.05 * i}s` }}>
+              <Icon name="check" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h4 className="modal-subheading">Technologies</h4>
+        <div className="chips">
+          {project.technologies.map((tech) => (
+            <span key={tech} className="chip">
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Projects = () => {
+  const [filter, setFilter] = useState("All");
+  const [selected, setSelected] = useState(null);
+
+  const filters = useMemo(
+    () => [
+      { label: "All", test: () => true },
+      { label: "Web3", test: isWeb3 },
+      { label: "Web Apps", test: (p) => !isWeb3(p) },
+    ],
+    []
+  );
+  const visible = projects.filter(filters.find((f) => f.label === filter).test);
+
+  useReveal([filter]);
+
+  return (
+    <section id="projects" className="section">
+      <div className="container">
+        <SectionHeading eyebrow="03 — Selected Work" title="Projects" />
+        <div className="filters" data-reveal>
+          {filters.map((f) => (
+            <button
+              key={f.label}
+              type="button"
+              className={`filter ${filter === f.label ? "is-active" : ""}`}
+              onClick={() => setFilter(f.label)}
+            >
+              {f.label}
+              <span className="filter-count">{projects.filter(f.test).length}</span>
+            </button>
+          ))}
+        </div>
+        <div className="projects-grid" key={filter}>
+          {visible.map((project, i) => (
+            <ProjectCard
+              key={project.title}
+              project={project}
+              index={i}
+              onOpen={() => setSelected(project)}
+            />
+          ))}
+        </div>
+      </div>
+      {selected && (
+        <ProjectModal project={selected} onClose={() => setSelected(null)} />
+      )}
+    </section>
+  );
+};
+
+const Contact = () => {
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -74,15 +482,15 @@ const App = () => {
 
     try {
       await emailjs.send(
-        "service_td8uspl", // Replace with your EmailJS service ID
-        "template_5hmwc73", // Replace with your EmailJS template ID
+        "service_td8uspl", // EmailJS service ID
+        "template_5hmwc73", // EmailJS template ID
         {
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
-          to_name: "Satvik", // Your name
+          to_name: "Satvik",
         },
-        "lmd2HufSYuYQm49rl" // Replace with your EmailJS public key
+        "lmd2HufSYuYQm49rl" // EmailJS public key
       );
 
       setSubmitStatus("success");
@@ -92,385 +500,123 @@ const App = () => {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
-      // Reset status after 5 seconds
       setTimeout(() => setSubmitStatus(null), 5000);
     }
   };
 
   return (
-    <div
-      className="custom-scrollbar"
-      style={{ height: "100vh", overflowY: "scroll" }}
-    >
-      {/* Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow">
-        <div className="d-flex justify-content-between align-items-center w-100 px-3">
-          <a className="navbar-brand fw-bold text-primary" href="#home">
-            Satvik Gadhiya
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded={!isNavCollapsed}
-            aria-label="Toggle navigation"
-            onClick={() => setIsNavCollapsed(!isNavCollapsed)}
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div
-            className={`${isNavCollapsed ? "collapse" : ""} navbar-collapse`}
-            id="navbarNav"
-          >
-            <ul className="navbar-nav ms-auto">
-              {[
-                "About",
-                "Skills",
-                "Projects",
-                "Contact",
-                "Download my Resume",
-              ].map((item) => (
-                <li className="nav-item" key={item}>
-                  {item === "Download my Resume" ? (
-                    <button
-                      className="nav-link px-3 border-0 bg-transparent"
-                      onClick={handleDownloadResume}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {item}
-                    </button>
-                  ) : (
-                    <a
-                      className="nav-link px-3"
-                      href={`#${item.toLowerCase()}`}
-                    >
-                      {item}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <div style={{ paddingTop: "56px" }}>
-        <section
-          className="hero-section d-flex align-items-center justify-content-center text-white"
-          style={{
-            // backgroundImage: 'url("./backImage.webp")',
-            backgroundImage: `url(${backImg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            minHeight: "100vh",
-            position: "relative",
-          }}
-          id="home"
-        >
-          {/* <div className="dark-overlay"></div> */}
-          <div className="container position-relative text-center">
-            <div className="row justify-content-center">
-              <div className="col-md-8">
-                <h1
-                  className="display-4 fw-bold mb-4"
-                  style={{
-                    color: "rgb(0 136 175)",
-                    textShadow: "rgba(0, 0, 0, 0.9) -2px -3px 2px",
-                  }}
-                >
-                  Frontend Web Developer
-                </h1>
-                <p
-                  className="lead mb-4"
-                  style={{
-                    color: "rgb(0 136 175)",
-                    textShadow: "rgba(0, 0, 0, 0.9) -2px -3px 2px",
-                    fontWeight: "bold",
-                    fontSize: "1.3  rem",
-                    letterSpacing: "2px",
-                  }}
-                >
-                  Crafting seamless digital experiences with passion
-                </p>
-                <a href="#contact" className="btn btn-border-4  px-5 py-3">
-                  Get in Touch
-                </a>
-              </div>
+    <section id="contact" className="section section-alt contact">
+      <div className="orb orb-c" />
+      <div className="container">
+        <SectionHeading eyebrow="04 — Contact" title="Let's Connect" />
+        <SpotlightCard className="card contact-card" data-reveal>
+          <form onSubmit={handleSubmit} className="contact-form">
+            <div className="field-row">
+              <label className="field">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder=" "
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+                <span>Your Name</span>
+              </label>
+              <label className="field">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder=" "
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+                <span>Your Email</span>
+              </label>
             </div>
-          </div>
-        </section>
+            <label className="field">
+              <textarea
+                name="message"
+                rows="5"
+                placeholder=" "
+                value={formData.message}
+                onChange={handleChange}
+                required
+              />
+              <span>Your Message</span>
+            </label>
+            <button
+              type="submit"
+              className={`btn btn-primary btn-block ${isSubmitting ? "is-loading" : ""}`}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="spinner" /> Sending...
+                </>
+              ) : (
+                <>
+                  Send Message <Icon name="send" />
+                </>
+              )}
+            </button>
+
+            {submitStatus && (
+              <div className={`alert alert-${submitStatus}`} role="alert">
+                {submitStatus === "success"
+                  ? "Message sent successfully!"
+                  : "Failed to send message. Please try again later."}
+              </div>
+            )}
+          </form>
+        </SpotlightCard>
       </div>
+    </section>
+  );
+};
 
-      {/* About Section */}
-      <section
-        id="about"
-        className={`py-5 section-padding fade-in ${
-          isVisible.about ? "visible" : ""
-        }`}
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div className="container">
-          <div className="row">
-            <div className="col-md-8 mx-auto">
-              <h2 className="display-5 fw-bold mb-4 text-center">About Me</h2>
-              <p className="lead text-muted text-center">
-                Hi, I'm Satvik, a passionate frontend web developer dedicated to
-                creating exceptional user experiences. With expertise in modern
-                web technologies and a keen eye for design, I transform complex
-                challenges into elegant, user-friendly solutions.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Skills Section */}
-      <section
-        id="skills"
-        className={`py-5 section-padding bg-light fade-in ${
-          isVisible.skills ? "visible" : ""
-        }`}
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div className="container">
-          <h2 className="display-5 fw-bold mb-5 text-center">Skills</h2>
-          <div className="row g-4">
-            {skills.map((skill) => (
-              <div className="col-6 col-md-3" key={skill}>
-                <div className="card h-100 border-0 shadow-sm skill-card">
-                  <div className="card-body text-center">
-                    <h5 className="card-title mb-0">{skill}</h5>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section
-        id="projects"
-        className="py-5 section-padding"
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div className="container">
-          <h2 className="display-5 fw-bold mb-5 text-center">Projects</h2>
-          <div className="row g-4">
-            {projects &&
-              Array.isArray(projects) &&
-              projects.map((project, projectIndex) => (
-                <div className="col-md-6" key={`project-${projectIndex}`}>
-                  <div className="card  border-0 shadow-sm project-card">
-                    <div className="card-body">
-                      <h3 className="card-title h4 fw-bold mb-3">
-                        {project.title}
-                      </h3>
-                      {project.duration && (
-                        <h6 className="card-subtitle mb-2 text-muted">
-                          {project.duration}
-                        </h6>
-                      )}
-                      {project.role && (
-                        <p className="card-text fw-bold mb-1">{project.role}</p>
-                      )}
-                      {project.description && (
-                        <p className="card-text text-muted">
-                          {project.description}
-                        </p>
-                      )}
-                      {project.links && project.links.length > 0 && (
-                        <div className="mb-2">
-                          {project.links
-                            .filter(
-                              (link) => link.url && link.url.trim() !== ""
-                            )
-                            .map((link, linkIndex) => (
-                              <a
-                                key={`link-${linkIndex}-${projectIndex}`}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="d-block text-primary text-decoration-none"
-                              >
-                                🔗 {link.name}
-                              </a>
-                            ))}
-                        </div>
-                      )}
-                      {project.contributions &&
-                        project.contributions.length > 0 && (
-                          <div className="mt-3">
-                            <ul className="list-unstyled">
-                              {project.contributions.map(
-                                (contribution, index) => (
-                                  <li key={index} className="text-muted mb-1">
-                                    • {contribution}
-                                  </li>
-                                )
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                      {project.technologies &&
-                        project.technologies.length > 0 && (
-                          <div className="mt-3">
-                            {project.technologies.map((tech, techIndex) => (
-                              <span
-                                key={`tech-${techIndex}-${projectIndex}`}
-                                className="badge bg-primary me-2 mb-2"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section
-        id="contact"
-        className={`py-5 section-padding bg-primary text-white fade-in ${
-          isVisible.contact ? "visible" : ""
-        }`}
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div className="container">
-          <h2 className="display-5 fw-bold mb-5 text-center">Let's Connect</h2>
-          <div className="row justify-content-center">
-            <div className="col-md-8 col-lg-6">
-              <div className="card border-0">
-                <div className="card-body p-4">
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Your Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <input
-                        type="email"
-                        className="form-control"
-                        placeholder="Your Email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <textarea
-                        className="form-control"
-                        rows="4"
-                        placeholder="Your Message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                      ></textarea>
-                    </div>
-                    <button
-                      type="submit"
-                      className={`btn btn-primary w-100 py-3 ${
-                        isSubmitting ? "disabled" : ""
-                      }`}
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Sending..." : "Send Message"}
-                    </button>
-
-                    {submitStatus === "success" && (
-                      <div className="alert alert-success mt-3" role="alert">
-                        Message sent successfully!
-                      </div>
-                    )}
-
-                    {submitStatus === "error" && (
-                      <div className="alert alert-danger mt-3" role="alert">
-                        Failed to send message. Please try again later.
-                      </div>
-                    )}
-                  </form>
-
-                  {/* Additional contact information */}
-                  {/* <div className="mt-5 text-center">
-                    <h4 className="mb-4">Or connect with me on:</h4>
-                    <div className="d-flex justify-content-center gap-4">
-                      <a
-                        href="https://linkedin.com/in/your-profile"
-                        className="text-primary"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <i className="bi bi-linkedin fs-3"></i>
-                      </a>
-                      <a
-                        href="https://github.com/your-profile"
-                        className="text-dark"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <i className="bi bi-github fs-3"></i>
-                      </a>
-                      <a
-                        href="mailto:your.email@example.com"
-                        className="text-danger"
-                      >
-                        <i className="bi bi-envelope fs-3"></i>
-                      </a>
-                    </div>
-                  </div> */}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer class="py-4 bg-dark text-white text-center">
-  <div class="container">
-    <p class="mb-0">
-      &copy; {currentYear} Satvik Gadhiya. All rights reserved.
-    </p>
-  </div>
-</footer>
+const Footer = () => (
+  <footer className="footer">
+    <div className="container footer-inner">
+      <p>&copy; {new Date().getFullYear()} Satvik Gadhiya. All rights reserved.</p>
+      <a href="#home" className="back-to-top" aria-label="Back to top">
+        <Icon name="up" />
+      </a>
     </div>
+  </footer>
+);
+
+const CursorGlow = () => {
+  useEffect(() => {
+    const onMove = (e) => {
+      document.documentElement.style.setProperty("--cx", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--cy", `${e.clientY}px`);
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+  return <div className="cursor-glow" aria-hidden="true" />;
+};
+
+const App = () => {
+  const active = useActiveSection(SECTION_IDS);
+  const [progress, scrolled] = useScrollProgress();
+  useReveal();
+
+  return (
+    <>
+      <CursorGlow />
+      <Navbar active={active} scrolled={scrolled} progress={progress} />
+      <main>
+        <Hero />
+        <About />
+        <Skills />
+        <Projects />
+        <Contact />
+      </main>
+      <Footer />
+    </>
   );
 };
 

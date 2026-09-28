@@ -1,59 +1,85 @@
-export const skills = [
-  // Core Web Technologies
-  "HTML 5",
-  "CSS 3",
-  "JavaScript",
-  "TypeScript",
-
-  // Frontend Frameworks & Libraries
-  "React",
-  "Next.js",
-  "Redux",
-  "Redux Toolkit",
-  "React Router",
-  "React Query",
-
-  // Styling & UI
-  "Tailwind CSS",
-  "Bootstrap",
-  "SCSS",
-  "Styled Components",
-  "Ant Design",
-  "Radix UI",
-  "Framer Motion",
-
-  // Backend & APIs
-  "Node.js",
-  "REST APIs",
-  "WebSocket",
-  "Axios",
-
-  // Blockchain & Web3
-  "Web3",
-
-  "Blockchain SDKs",
-
-  // Data Visualization
-  "Chart.js",
-  "Recharts",
-  "ApexCharts",
-  "Three.js",
-
-  // Version Control
-  "Git",
-  "GitHub",
-
-  // Other Technologies
-  "Vite",
-  "Moment.js",
-  "React Hook Form",
-  "Lottie",
-  "Canvas APIs",
-  "PHP",
-  "MySQL",
-  "C",
-  "Java",
+export const skillGroups = [
+  {
+    title: "Core Web Technologies",
+    items: [
+      "HTML 5",
+      "CSS 3",
+      "JavaScript",
+      "TypeScript",
+    ],
+  },
+  {
+    title: "Frontend Frameworks & Libraries",
+    items: [
+      "React",
+      "Next.js",
+      "Redux",
+      "Redux Toolkit",
+      "React Router",
+      "React Query",
+    ],
+  },
+  {
+    title: "Styling & UI",
+    items: [
+      "Tailwind CSS",
+      "Bootstrap",
+      "SCSS",
+      "Styled Components",
+      "Ant Design",
+      "Radix UI",
+      "Framer Motion",
+    ],
+  },
+  {
+    title: "Backend & APIs",
+    items: [
+      "Node.js",
+      "REST APIs",
+      "WebSocket",
+      "Axios",
+    ],
+  },
+  {
+    title: "Blockchain & Web3",
+    items: [
+      "Web3",
+      "Blockchain SDKs",
+    ],
+  },
+  {
+    title: "Data Visualization",
+    items: [
+      "Chart.js",
+      "Recharts",
+      "ApexCharts",
+      "Three.js",
+    ],
+  },
+  {
+    title: "Version Control",
+    items: [
+      "Git",
+      "GitHub",
+    ],
+  },
+  {
+    title: "Other Technologies",
+    items: [
+      "Vite",
+      "Moment.js",
+      "React Hook Form",
+      "Lottie",
+      "Canvas APIs",
+      "PHP",
+      "MySQL",
+      "C",
+      "Java",
+    ],
+  },
 ];
+
+export const skills = skillGroups.flatMap((group) => group.items);
 
 export const projects = [
   {
@@ -237,7 +263,7 @@ export const projects = [
   },
   {
     title: "DIAM Casino - Blockchain Gaming Platform",
-    duration: "september 2024 - April 2025",
+    duration: "September 2024 - April 2025",
     role: "Frontend Developer",
     description:
       "Web3-powered casino gaming platform with multiple interactive games, wallet integration, and real-money transactions using blockchain technology",
@@ -381,9 +407,9 @@ export const projects = [
       "JavaScript",
       "HTML5",
       "CSS3",
-      "Tailwind css",
-      "readct redux",
-      "framer motion",
+      "Tailwind CSS",
+      "React Redux",
+      "Framer Motion",
       "react-toastify",
       "lucide icons",
       "react-chartjs",
@@ -418,7 +444,7 @@ export const projects = [
   },
   {
     title: "HRMS Dashboard - Human Resource Management System",
-    duration: "Feb 2024 - Nob 2024",
+    duration: "Feb 2024 - Nov 2024",
     role: "Frontend Developer",
     description:
       "Comprehensive HR management platform with employee tracking, analytics dashboard, organizational hierarchy, and document management capabilities",
