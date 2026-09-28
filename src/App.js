@@ -81,7 +81,7 @@ const App = () => {
           message: formData.message,
           to_name: "Satvik", // Your name
         },
-        "IPfaPPdI9bPEzOSIW" // Replace with your EmailJS public key
+        "lmd2HufSYuYQm49rl" // Replace with your EmailJS public key
       );
 
       setSubmitStatus("success");
