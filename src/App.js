@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./styles.css";
-import emailjs from "@emailjs/browser";
 import { projects, skillGroups, skills } from "./Data/data.js";
 import ParticleField from "./components/ParticleField";
 import {
@@ -481,17 +480,23 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      await emailjs.send(
-        "service_td8uspl", // EmailJS service ID
-        "template_5hmwc73", // EmailJS template ID
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-          to_name: "Satvik",
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        "lmd2HufSYuYQm49rl" // EmailJS public key
-      );
+        body: JSON.stringify({
+          access_key: "36ef551f-0a23-4572-be99-58c96fd22642", // Web3Forms public access key
+          subject: `Portfolio message from ${formData.name}`,
+          from_name: "Portfolio Contact Form",
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.message);
 
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "" });
