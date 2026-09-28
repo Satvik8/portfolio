@@ -10,6 +10,7 @@ const App = () => {
   console.log("Is array:", Array.isArray(projects));
   const [isVisible, setIsVisible] = useState({});
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -462,13 +463,13 @@ const App = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-4 bg-dark text-white text-center">
-        <div className="container">
-          <p className="mb-0">
-            &copy; 2024 Satvik Gadhiya. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <footer class="py-4 bg-dark text-white text-center">
+  <div class="container">
+    <p class="mb-0">
+      &copy; {currentYear} Satvik Gadhiya. All rights reserved.
+    </p>
+  </div>
+</footer>
     </div>
   );
 };
